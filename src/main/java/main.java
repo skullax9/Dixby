@@ -8,7 +8,7 @@ import javax.security.auth.login.LoginException;
 public class main extends ListenerAdapter {
     static String COMMAND;
     public static void main(String[] Args) throws LoginException {
-        JDA jda= JDABuilder.createDefault("ODMxMDI2OTk0MzQ2NTkwMjEw.YHPQMw.OlIjlXfACXdj6IvGtwbUlpLxurc").build(); //기본 jda
+        JDA jda= JDABuilder.createDefault("discord bot token").build(); //기본 jda
 
         jda.addEventListener(new main()); //jda에 이벤트를 감지하는 리스너를 넣는다.
     }
