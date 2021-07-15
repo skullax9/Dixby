@@ -1,29 +1,87 @@
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
 
 public class corona {
-    public static void main(String[] args) throws IOException {
+    static int yesCnt;
+    static int todayCnt;
+    static int decideCnt;
+    static Element element;
+
+    public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException, ParseException {
+
+        // 날짜 포맷
         SimpleDateFormat ymd = new SimpleDateFormat("yyyyMMdd");
-        Calendar cal = Calendar.getInstance();
-        String today = ymd.format(cal.getTime());
+
+        // 오늘 날짜
+        Calendar todayCal = Calendar.getInstance();
+        String today = ymd.format(todayCal.getTime());
+        // 어제 날짜
+        Calendar yesCal = Calendar.getInstance();
+        yesCal.add(Calendar.DATE,-1);
+        String yesterday = ymd.format(yesCal.getTime());
 
         NodeList nList = null;
+
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder builder = factory.newDocumentBuilder();
 
         StringBuilder urlBuilder = new StringBuilder("http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19InfStateJson"); /*URL*/
         urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "=API SERVICE KEY"); /*Service Key*/
         urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
         urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("10", "UTF-8")); /*한 페이지 결과 수*/
-        urlBuilder.append("&" + URLEncoder.encode("startCreateDt","UTF-8") + "=" + URLEncoder.encode(today, "UTF-8")); /*검색할 생성일 범위의 시작*/
+        urlBuilder.append("&" + URLEncoder.encode("startCreateDt","UTF-8") + "=" + URLEncoder.encode(yesterday, "UTF-8")); /*검색할 생성일 범위의 시작*/
         urlBuilder.append("&" + URLEncoder.encode("endCreateDt","UTF-8") + "=" + URLEncoder.encode(today, "UTF-8")); /*검색할 생성일 범위의 종료*/
+
         URL url = new URL(urlBuilder.toString());
+        Document document = builder.parse(urlBuilder.toString());
+        document.normalize();
+
+        nList = document.getElementsByTagName("item");
+
+        for(int i = 0; i < nList.getLength(); i++) {
+            Node node = nList.item(i);
+
+            //실질적으로 Element를 조작하기 위해 값을 넣어준다.
+            element = (Element) node;
+
+            //최종적으로 우리가 가져오고 싶은 태그의 내용을 가져온다.
+            System.out.println("기준 날짜 : "+getTagValue("createDt",element)); // 기준일
+            System.out.println("치료중 수 : "+getTagValue("careCnt",element)); // 치료중 수
+            System.out.println("완치자 수 : "+getTagValue("clearCnt",element)); // 완치자 수
+            System.out.println("사망자 수 : "+getTagValue("deathCnt",element)); // 사망자 수
+            System.out.println("총 확진자 수 : "+getTagValue("decideCnt",element)); // 총확진자 수
+
+            String eleDate = getTagValue("createDt",element);
+            String extDate= eleDate.substring(0,10);
+            String ymdDate = extDate.replace("-","");
+
+            if (today.equals(ymdDate)) {
+                todayCnt = Integer.parseInt(getTagValue("decideCnt",element));
+            } else {
+                yesCnt = Integer.parseInt(getTagValue("decideCnt",element));
+            }
+
+            decideCnt = todayCnt - yesCnt;
+        }
+
+        System.out.println("전일 대비 확진자 "+decideCnt+"명 증가");
+
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-type", "application/json");
@@ -42,5 +100,13 @@ public class corona {
         rd.close();
         conn.disconnect();
         System.out.println(sb.toString());
+    }
+
+    private static String getTagValue(String tag, Element element) {
+        NodeList nList = element.getElementsByTagName(tag).item(0).getChildNodes();
+        Node value = (Node) nList.item(0);
+        if(value == null)
+            return null;
+        return value.getNodeValue();
     }
 }
