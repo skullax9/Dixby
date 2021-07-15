@@ -1,3 +1,5 @@
+package Dixby;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -18,10 +20,16 @@ import java.util.Calendar;
 import java.text.SimpleDateFormat;
 
 public class corona {
-    static int yesCnt;
-    static int todayCnt;
-    static int decideCnt;
-    static Element element;
+
+        static int yesCnt;
+        static int todayCnt;
+        static int decideCnt;
+        static String createDt;
+        static int careCnt;
+        static int clearCnt;
+        static int deathCnt;
+        static int totalCnt;
+        static Element element;
 
     public static void main(String[] args) throws IOException, ParserConfigurationException, SAXException, ParseException {
 
@@ -42,7 +50,7 @@ public class corona {
         DocumentBuilder builder = factory.newDocumentBuilder();
 
         StringBuilder urlBuilder = new StringBuilder("http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19InfStateJson"); /*URL*/
-        urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "=API SERVICE KEY"); /*Service Key*/
+        urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "=SERVICE KEYS"); /*Service Key*/
         urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
         urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("10", "UTF-8")); /*한 페이지 결과 수*/
         urlBuilder.append("&" + URLEncoder.encode("startCreateDt","UTF-8") + "=" + URLEncoder.encode(yesterday, "UTF-8")); /*검색할 생성일 범위의 시작*/
@@ -60,32 +68,27 @@ public class corona {
             //실질적으로 Element를 조작하기 위해 값을 넣어준다.
             element = (Element) node;
 
-            //최종적으로 우리가 가져오고 싶은 태그의 내용을 가져온다.
-            System.out.println("기준 날짜 : "+getTagValue("createDt",element)); // 기준일
-            System.out.println("치료중 수 : "+getTagValue("careCnt",element)); // 치료중 수
-            System.out.println("완치자 수 : "+getTagValue("clearCnt",element)); // 완치자 수
-            System.out.println("사망자 수 : "+getTagValue("deathCnt",element)); // 사망자 수
-            System.out.println("총 확진자 수 : "+getTagValue("decideCnt",element)); // 총확진자 수
-
             String eleDate = getTagValue("createDt",element);
             String extDate= eleDate.substring(0,10);
             String ymdDate = extDate.replace("-","");
 
             if (today.equals(ymdDate)) {
-                todayCnt = Integer.parseInt(getTagValue("decideCnt",element));
+                createDt = getTagValue("createDt",element); // 기준 날짜
+                careCnt = Integer.parseInt(getTagValue("careCnt",element)); // 치료중인 확진자 수
+                clearCnt = Integer.parseInt(getTagValue("clearCnt",element)); // 완치된 확진자 수
+                deathCnt = Integer.parseInt(getTagValue("deathCnt",element)); // 사망한 확진자 수
+                totalCnt = Integer.parseInt(getTagValue("decideCnt",element)); // 전체 확진자 수
             } else {
                 yesCnt = Integer.parseInt(getTagValue("decideCnt",element));
             }
 
-            decideCnt = todayCnt - yesCnt;
+            decideCnt = totalCnt - yesCnt;
         }
-
-        System.out.println("전일 대비 확진자 "+decideCnt+"명 증가");
 
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
         conn.setRequestProperty("Content-type", "application/json");
-        System.out.println("Response code: " + conn.getResponseCode());
+        //System.out.println("Response code: " + conn.getResponseCode());
         BufferedReader rd;
         if(conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
             rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
@@ -99,7 +102,7 @@ public class corona {
         }
         rd.close();
         conn.disconnect();
-        System.out.println(sb.toString());
+        //System.out.println(sb.toString());
     }
 
     private static String getTagValue(String tag, Element element) {
