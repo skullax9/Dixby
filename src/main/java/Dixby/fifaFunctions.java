@@ -50,7 +50,7 @@ public class fifaFunctions {
         } else if (i == 2100) {
             divisionName = "월드클래스2";
         } else if (i == 2000) {
-            divisionName = "원드클래스1";
+            divisionName = "월드클래스1";
         } else if (i == 1300) {
             divisionName = "챌린지3";
         } else if (i == 1200) {

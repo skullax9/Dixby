@@ -11,16 +11,19 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.text.ParseException;
 
+import static Dixby.FifaDBConnect.*;
 import static Dixby.corona.*;
 import static Dixby.fifaHighRank.*;
 import static Dixby.fifaUserSearch.*;
 import static Dixby.fifaFunctions.*;
+import static Dixby.Project_Datas.*;
 
 public class main extends ListenerAdapter {
     public static String COMMAND;
     fifaFunctions fifaFunctions = new fifaFunctions();
+    FifaDBConnect fifaDBConnect = new FifaDBConnect();
     public static void main(String[] Args) throws LoginException {
-        JDA jda= JDABuilder.createDefault("DISCORD BOT TOKENS").build(); //기본 jda
+        JDA jda= JDABuilder.createDefault(Discord_Keys).build(); //기본 jda
 
         jda.addEventListener(new main()); //jda에 이벤트를 감지하는 리스너를 넣는다.
     }
@@ -43,12 +46,13 @@ public class main extends ListenerAdapter {
 
             event.getChannel().sendMessage(
                     "엑세스 아이디: "+accessID+"\n"+
-                            "닉네임: "+nickname+"\n"+
-                            "레벨: "+level+"\n"
+                    "닉네임: "+nickname+"\n"+
+                    "레벨: "+level+"\n"
             ).queue();
 
         } else if (COMMAND.contains("!최고등급 ")) {
             try {
+                fifaDBConnect.UserHighRank();
                 fifaHighRank.main(null);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -61,10 +65,18 @@ public class main extends ListenerAdapter {
             fifaFunctions.matchType(matchType);
             fifaFunctions.matchDivision(division);
 
-            event.getChannel().sendMessage(
-                    "경기 타입: "+matchName+"\n"+
-                            "최고 등급: "+divisionName+"\n"
-            ).queue();
+            if (matchType == 0 || achieveDate == null) {
+                event.getChannel().sendMessage(
+                        ":x: "+nick+"님의 최고등급 기록이 없습니다."
+                ).queue();
+            } else {
+                event.getChannel().sendMessage(
+                        nick+"님의 최고등급 기록입니다.\n"+
+                                "경기 타입: "+matchName+"\n"+
+                                "최고 등급: "+divisionName+"\n"+
+                                "달성 일자: "+achieveDate
+                ).queue();
+            }
 
         } else if (COMMAND.contains("!코로나")) {
             try {
@@ -79,12 +91,12 @@ public class main extends ListenerAdapter {
                 e.printStackTrace();
             }
             event.getChannel().sendMessage(
-                    ":calendar:기준 날짜: "+createDt+"\n"+
-                    "전일 대비 확진자 "+decideCnt+"명 증가\n"+
-                    "총 확진자 수: "+totalCnt+"명\n"+
-                    "치료중인 확진자 수: "+careCnt+"명\n"+
-                    "완치된 확진자 수: "+clearCnt+"명\n"+
-                    "사망한 확진자 수: "+deathCnt+"명"
+                    ":calendar: 기준 날짜: "+createDt+"\n"+
+                    ":arrow_up: 전일 대비 확진자 "+decideCnt+"명 증가\n"+
+                    ":mask: 총 확진자 수: "+totalCnt+"명\n"+
+                    ":sneezing_face: 치료중인 확진자 수: "+careCnt+"명\n"+
+                    ":white_check_mark: 완치된 확진자 수: "+clearCnt+"명\n"+
+                    ":pray: 사망한 확진자 수: "+deathCnt+"명"
                     ).queue();
         }
     }

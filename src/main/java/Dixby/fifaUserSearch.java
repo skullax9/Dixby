@@ -12,11 +12,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import static Dixby.main.COMMAND;
-
+import static Dixby.Project_Datas.*;
 
 public class fifaUserSearch {
-    static String API_KEY = "FIFA API KEYS";
     static JSONParser jsonParser;
+    static JSONObject jsonObj;
     static String accessID;
     static String nickname;
     static Long level;
@@ -24,14 +24,13 @@ public class fifaUserSearch {
     static StringBuilder urlBuilder;
     static String fifaData;
     public static void main(String[] args) throws IOException, ParseException, org.json.simple.parser.ParseException {
-
         urlBuilder = new StringBuilder("https://api.nexon.co.kr/fifaonline4/v1.0/users?nickname="+URLEncoder.encode(COMMAND.substring(4),"UTF-8")); /*URL*/
 
         url = new URL(urlBuilder.toString());
 
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
-        conn.setRequestProperty("Authorization", API_KEY);
+        conn.setRequestProperty("Authorization", Fifa_keys);
         conn.setRequestProperty("Content-type", "application/json");
         BufferedReader rd;
         if(conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
@@ -54,6 +53,10 @@ public class fifaUserSearch {
         accessID = (String) jsonObj.get("accessId");
         nickname = (String) jsonObj.get("nickname");
         level = (Long) jsonObj.get("level");
+
+        FifaDBConnect fifaDBConnect = new FifaDBConnect();
+        fifaDBConnect.DBConnect();
+
 
     }
 }

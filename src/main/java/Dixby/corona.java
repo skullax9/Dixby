@@ -19,8 +19,9 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
 
-public class corona {
+import static Dixby.Project_Datas.*;
 
+public class corona {
         static int yesCnt;
         static int todayCnt;
         static int decideCnt;
@@ -50,7 +51,7 @@ public class corona {
         DocumentBuilder builder = factory.newDocumentBuilder();
 
         StringBuilder urlBuilder = new StringBuilder("http://openapi.data.go.kr/openapi/service/rest/Covid19/getCovid19InfStateJson"); /*URL*/
-        urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + "=SERVICE KEYS"); /*Service Key*/
+        urlBuilder.append("?" + URLEncoder.encode("ServiceKey","UTF-8") + Corona_Keys); /*Service Key*/
         urlBuilder.append("&" + URLEncoder.encode("pageNo","UTF-8") + "=" + URLEncoder.encode("1", "UTF-8")); /*페이지번호*/
         urlBuilder.append("&" + URLEncoder.encode("numOfRows","UTF-8") + "=" + URLEncoder.encode("10", "UTF-8")); /*한 페이지 결과 수*/
         urlBuilder.append("&" + URLEncoder.encode("startCreateDt","UTF-8") + "=" + URLEncoder.encode(yesterday, "UTF-8")); /*검색할 생성일 범위의 시작*/

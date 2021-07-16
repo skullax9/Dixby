@@ -12,11 +12,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import static Dixby.main.COMMAND;
-
+import static Dixby.Project_Datas.*;
+import static Dixby.FifaDBConnect.*;
 
 public class fifaHighRank{
-    static String API_KEY = "FIFA API KEYS";
-    static JSONObject jsonObj;
     static JSONParser jsonParser;
     static int matchType;
     static int division;
@@ -25,14 +24,13 @@ public class fifaHighRank{
     static StringBuilder urlBuilder;
     static String fifaData;
     public static void main(String[] args) throws IOException, ParseException, org.json.simple.parser.ParseException {
-
-        urlBuilder = new StringBuilder("https://api.nexon.co.kr/fifaonline4/v1.0/users/"+COMMAND.substring(6)+"/maxdivision"); /*URL*/
+        urlBuilder = new StringBuilder("https://api.nexon.co.kr/fifaonline4/v1.0/users/"+accid+"/maxdivision"); /*URL*/
 
         url = new URL(urlBuilder.toString());
 
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
-        conn.setRequestProperty("Authorization", API_KEY);
+        conn.setRequestProperty("Authorization", Fifa_keys);
         conn.setRequestProperty("Content-type", "application/json");
         BufferedReader rd;
         if(conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
@@ -49,15 +47,18 @@ public class fifaHighRank{
         conn.disconnect();
         fifaData = sb.toString();
 
+        //System.out.println(fifaData);
+
         jsonParser = new JSONParser();
-        jsonObj = (JSONObject) jsonParser.parse(fifaData);
-        JSONArray memberArray = (JSONArray) jsonObj.get(fifaData);
+        Object obj = jsonParser.parse(fifaData);
+        JSONArray memberArray = (JSONArray) obj;
 
         for(int i=0 ; i<memberArray.size() ; i++){
             JSONObject tempObj = (JSONObject) memberArray.get(i);
-            matchType = (int) tempObj.get("matchType");
-            division = (int) tempObj.get("division");
+            matchType = Integer.parseInt(String.valueOf(tempObj.get("matchType")));
+            division = Integer.parseInt(String.valueOf(tempObj.get("division")));
             achieveDate = (String) tempObj.get("achievementDate");
         }
     }
+
 }
