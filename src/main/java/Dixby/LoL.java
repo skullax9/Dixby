@@ -14,7 +14,7 @@ import org.json.simple.parser.JSONParser;
 import static Dixby.main.COMMAND;
 import static Dixby.Project_Datas.*;
 
-public class fifaUserSearch {
+public class LoL {
     static JSONParser jsonParser;
     static JSONObject jsonObj;
     static String accessID;
@@ -24,13 +24,12 @@ public class fifaUserSearch {
     static StringBuilder urlBuilder;
     static String fifaData;
     public static void main(String[] args) throws IOException, ParseException, org.json.simple.parser.ParseException {
-        urlBuilder = new StringBuilder("https://api.nexon.co.kr/fifaonline4/v1.0/users?nickname="+URLEncoder.encode(COMMAND.substring(4),"UTF-8")); /*URL*/
+        urlBuilder = new StringBuilder("https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/%EC%9D%B8%EA%B0%84%EC%82%AC%EB%83%A5?api_key=RGAPI-f8016a1c-07c1-40bf-8a17-76b146b69c32"); /*URL*/
 
         url = new URL(urlBuilder.toString());
 
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("GET");
-        conn.setRequestProperty("Authorization", Fifa_keys);
         conn.setRequestProperty("Content-type", "application/json");
         BufferedReader rd;
         if(conn.getResponseCode() >= 200 && conn.getResponseCode() <= 300) {
@@ -50,12 +49,14 @@ public class fifaUserSearch {
         jsonParser = new JSONParser();
         jsonObj = (JSONObject) jsonParser.parse(fifaData);
 
-        accessID = (String) jsonObj.get("accessId");
-        nickname = (String) jsonObj.get("nickname");
-        level = (Long) jsonObj.get("level");
+        System.out.println(fifaData);
 
-        fifaDBConnect fifaDBConnect = new fifaDBConnect();
-        fifaDBConnect.DBConnect();
+//        accessID = (String) jsonObj.get("accessId");
+//        nickname = (String) jsonObj.get("nickname");
+//        level = (Long) jsonObj.get("level");
+//
+//        FifaDBConnect fifaDBConnect = new FifaDBConnect();
+//        fifaDBConnect.DBConnect();
 
 
     }

@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.json.simple.JSONObject;
 import org.xml.sax.SAXException;
 
 import javax.security.auth.login.LoginException;
@@ -11,17 +12,20 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.text.ParseException;
 
-import static Dixby.FifaDBConnect.*;
+import static Dixby.fifaDBConnect.*;
 import static Dixby.corona.*;
 import static Dixby.fifaHighRank.*;
 import static Dixby.fifaUserSearch.*;
-import static Dixby.fifaFunctions.*;
+import static Dixby.Functions.*;
 import static Dixby.Project_Datas.*;
+import static Dixby.naverNews.*;
 
 public class main extends ListenerAdapter {
     public static String COMMAND;
-    fifaFunctions fifaFunctions = new fifaFunctions();
-    FifaDBConnect fifaDBConnect = new FifaDBConnect();
+    public static String cleanTitle;
+    public static String cleanDes;
+    Functions Functions = new Functions();
+    fifaDBConnect fifaDBConnect = new fifaDBConnect();
     public static void main(String[] Args) throws LoginException {
         JDA jda= JDABuilder.createDefault(Discord_Keys).build(); //기본 jda
 
@@ -62,8 +66,8 @@ public class main extends ListenerAdapter {
                 e.printStackTrace();
             }
 
-            fifaFunctions.matchType(matchType);
-            fifaFunctions.matchDivision(division);
+            Functions.matchType(matchType);
+            Functions.matchDivision(division);
 
             if (matchType == 0 || achieveDate == null) {
                 event.getChannel().sendMessage(
@@ -77,6 +81,8 @@ public class main extends ListenerAdapter {
                                 "달성 일자: "+achieveDate
                 ).queue();
             }
+
+        } else if (COMMAND.contains("!롤 ")){
 
         } else if (COMMAND.contains("!코로나")) {
             try {
@@ -98,6 +104,28 @@ public class main extends ListenerAdapter {
                     ":white_check_mark: 완치된 확진자 수: "+clearCnt+"명\n"+
                     ":pray: 사망한 확진자 수: "+deathCnt+"명"
                     ).queue();
+        } else if (COMMAND.contains("!뉴스 ")){
+            naverNews.main(null);
+            for(int i=0 ; i<newsArray.size() ; i++){
+                JSONObject tempObj = (JSONObject) newsArray.get(i);
+                cleanTitle = tempObj.get("title").toString();
+                cleanDes = tempObj.get("description").toString();
+                String replaceTitle = cleanTitle
+                        .replace("<b>","")
+                        .replace("</b>","")
+                        .replace("&quot;","");
+                String replaceDes = cleanDes
+                        .replace("<b>","")
+                        .replace("</b>","")
+                        .replace("&quot;","");
+
+                event.getChannel().sendMessage(
+                           (i+1)+"번째 기사 제목: "+replaceTitle+"\n"+
+                                (i+1)+"번째 기사 요약: "+replaceDes+"\n"+
+                                (i+1)+"번째 기사 날짜: "+tempObj.get("pubDate")+"\n"+
+                                (i+1)+"번째 기사 더보기: "+tempObj.get("originallink")+"\n\n\n"
+                ).queue();
+            }
         }
     }
 

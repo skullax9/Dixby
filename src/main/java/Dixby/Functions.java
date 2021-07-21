@@ -1,9 +1,8 @@
 package Dixby;
 
-public class fifaFunctions {
+public class Functions {
     static String matchName;
     static String divisionName;
-
     void matchType(int i) {
         if (i == 30) {
             matchName = "리그 친선";
@@ -64,6 +63,5 @@ public class fifaFunctions {
         } else if (i < 800) {
             divisionName = "슈퍼챔피언스";
         }
-
     }
 }

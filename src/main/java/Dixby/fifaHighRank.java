@@ -11,9 +11,8 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import static Dixby.main.COMMAND;
 import static Dixby.Project_Datas.*;
-import static Dixby.FifaDBConnect.*;
+import static Dixby.fifaDBConnect.*;
 
 public class fifaHighRank{
     static JSONParser jsonParser;

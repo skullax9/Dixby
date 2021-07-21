@@ -5,7 +5,7 @@ import static Dixby.Project_Datas.*;
 import static Dixby.fifaUserSearch.*;
 import static Dixby.main.COMMAND;
 
-public class FifaDBConnect {
+public class fifaDBConnect {
     static String sql = null;
     static Connection conn = null;
     static ResultSet rs = null;
